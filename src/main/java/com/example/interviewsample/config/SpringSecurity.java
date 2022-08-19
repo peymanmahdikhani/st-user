@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -41,10 +42,30 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter{
         http.httpBasic();
     }
 
+
+    //Way 2 to have own in memory authentication
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+                .withUser("admin")
+                .password("{noop}pass")// {noop} is for defining password encoder
+                .roles("ADMIN")
+                .and()
+                .withUser("user")
+                .password("{noop}pass")
+                .roles("USER");
+
+        auth.inMemoryAuthentication()
+                .withUser("user2")
+                .password("{noop}passwd")
+                .roles("USER");
+
+    }
+
+    //Way 1 to have own in memory authentication
+   /* @Override
     @Bean
     protected UserDetailsService userDetailsService() {
-        UserDetailsService userDetailsService = super.userDetailsService();
         UserDetails admin = User
                 .withDefaultPasswordEncoder()
                 .username("admin")
@@ -60,5 +81,5 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter{
                 .build();
 
         return new InMemoryUserDetailsManager(Lists.newArrayList(admin, user));
-    }
+    }*/
 }
