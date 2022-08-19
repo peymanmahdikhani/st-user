@@ -74,4 +74,11 @@ public class UserTestWebMvc {
                 .perform(get("/user/0").with(httpBasic("myuser","123456")))
                 .andExpect(MockMvcResultMatchers.content().json(userStr));
     }
+
+    @Test
+    public void testAccessIndexWithoutAuthentication() throws Exception {
+        mockMvc
+                .perform(get("/"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 }
