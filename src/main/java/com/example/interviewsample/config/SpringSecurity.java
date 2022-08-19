@@ -12,6 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import java.util.Collections;
@@ -25,6 +28,13 @@ import java.util.Collections;
 @Configuration
 @EnableWebSecurity
 public class SpringSecurity extends WebSecurityConfigurerAdapter{
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+//        return NoOpPasswordEncoder.getInstance();
+        //supports all type of encryption automatically by prefixes {bcrypt} or {noop} or {sha256} ... in passwords
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests(
@@ -48,16 +58,16 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter{
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
                 .withUser("admin")
-                .password("{noop}pass")// {noop} is for defining password encoder
+                .password("pass")// {noop}pass is for defining password encoder
                 .roles("ADMIN")
                 .and()
                 .withUser("user")
-                .password("{noop}pass")
+                .password("pass")
                 .roles("USER");
 
         auth.inMemoryAuthentication()
                 .withUser("user2")
-                .password("{noop}passwd")
+                .password("passwd")
                 .roles("USER");
 
     }
