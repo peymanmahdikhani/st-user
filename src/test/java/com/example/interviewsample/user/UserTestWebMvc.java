@@ -71,7 +71,7 @@ public class UserTestWebMvc {
 
         String userStr = objectMapper.writeValueAsString(new User(-1L, "salam"));
         mockMvc
-                .perform(get("/user/0").with(httpBasic("myuser","123456")))
+                .perform(get("/user/0").with(httpBasic("admin","pass")))
                 .andExpect(MockMvcResultMatchers.content().json(userStr));
     }
 
