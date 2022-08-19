@@ -2,9 +2,8 @@ package com.example.interviewsample.user;
 
 import com.example.interviewsample.service.UserService;
 import com.example.interviewsample.web.User;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -40,10 +40,13 @@ public class UserTestWebMvc {
     @MockBean
     private UserService userService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void setUp(){
-//        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+//        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
@@ -56,13 +59,19 @@ public class UserTestWebMvc {
     @WithMockUser("myuser_also_wrong")
     @Test
     public void testWithAnyUser() throws Exception {
-        mockMvc.perform(get("/user/1")).andExpect(MockMvcResultMatchers.content().string("peyman"));
+        when(userService.getUser(Mockito.anyLong())).thenReturn(Optional.of(new User(-1L, "salam")));
+        String userStr = objectMapper.writeValueAsString(new User(-1L, "salam"));
+        mockMvc.perform(get("/user/1")).andExpect(MockMvcResultMatchers.content().string(userStr));
     }
 
     @Test
     public void testWithHttpBasic() throws Exception {
+        when(userService.getUser(Mockito.anyLong())).thenReturn(Optional.of(new User(-1L, "salam")));
+
+
+        String userStr = objectMapper.writeValueAsString(new User(-1L, "salam"));
         mockMvc
-                .perform(get("/person/1").with(httpBasic("myuser","123456")))
-                .andExpect(MockMvcResultMatchers.content().string("peyman"));
+                .perform(get("/user/0").with(httpBasic("myuser","123456")))
+                .andExpect(MockMvcResultMatchers.content().json(userStr));
     }
 }
