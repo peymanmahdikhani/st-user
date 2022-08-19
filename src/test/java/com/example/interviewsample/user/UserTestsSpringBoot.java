@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
  * interview-sample
  */
 @SpringBootTest
-public class UserTests {
+public class UserTestsSpringBoot {
     @Mock
     private UserRepository userRepository;
     @InjectMocks

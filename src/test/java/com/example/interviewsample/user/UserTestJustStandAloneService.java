@@ -1,6 +1,9 @@
 package com.example.interviewsample.user;
 
+import com.example.interviewsample.data.UserEntity;
+import com.example.interviewsample.data.UserRepository;
 import com.example.interviewsample.service.UserService;
+import com.example.interviewsample.service.UserServiceImpl;
 import com.example.interviewsample.web.User;
 import com.example.interviewsample.web.UserController;
 import org.junit.jupiter.api.Assertions;
@@ -25,24 +28,17 @@ import static org.mockito.Mockito.when;
  * workspace
  */
 @ExtendWith(MockitoExtension.class)
-public class UserTestJustStandAloneController {
-
-    private MockMvc mockMvc;
+public class UserTestJustStandAloneService {
 
     @Mock
-    private UserService userService;
+    private UserRepository userRepository;
 
     @InjectMocks
-    private UserController userController;
-
-    @BeforeEach
-    void setUp(){
-        this.mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
-    }
+    private UserServiceImpl userService;
 
     @Test
     void getUser() throws Exception {
-        when(userService.getUser(Mockito.anyLong())).thenReturn(Optional.of(new User(-1L, "salam")));
+        when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new UserEntity(-1L, "salam")));
 
         Assertions.assertEquals(-1L, userService.getUser(Mockito.anyLong()).get().getId());
     }
