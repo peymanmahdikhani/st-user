@@ -1,23 +1,19 @@
 package com.example.interviewsample.config;
 
-import com.google.common.collect.Lists;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-
-import java.util.Collections;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Created by Peyman Mahdikhani on 8/19/2022.
@@ -28,6 +24,18 @@ import java.util.Collections;
 @Configuration
 @EnableWebSecurity
 public class SpringSecurity extends WebSecurityConfigurerAdapter{
+
+//    @Autowired
+//    private UserDetailsService userDetailsService;//MyUserDetailService
+
+    public SecurityCustomAuthenticationFilter securityCustomAuthenticationFilter(AuthenticationManager authenticationManager){
+        SecurityCustomAuthenticationFilter securityCustomAuthenticationFilter = new SecurityCustomAuthenticationFilter(
+                new AntPathRequestMatcher("/user/**", HttpMethod.DELETE.toString())
+        );
+        securityCustomAuthenticationFilter.setAuthenticationManager(authenticationManager);
+        return securityCustomAuthenticationFilter;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder(){
 //        return NoOpPasswordEncoder.getInstance();
@@ -37,6 +45,9 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter{
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.addFilterBefore(securityCustomAuthenticationFilter(authenticationManager()),
+                        UsernamePasswordAuthenticationFilter.class).csrf().disable();
+
         http.authorizeRequests(
                 (requests) -> requests
                         //expect some url from authentication
@@ -54,11 +65,11 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter{
 
 
     //Way 2 to have own in memory authentication
-    @Override
+    /*@Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
                 .withUser("admin")
-                .password("pass")// {noop}pass is for defining password encoder
+                .password("{noop}pass")// {noop}pass is for defining password encoder
                 .roles("ADMIN")
                 .and()
                 .withUser("user")
@@ -67,10 +78,11 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter{
 
         auth.inMemoryAuthentication()
                 .withUser("user2")
-                .password("passwd")
+                .password("{noop}passwd")
                 .roles("USER");
+//        auth.userDetailsService(userDetailsService);
 
-    }
+    }*/
 
     //Way 1 to have own in memory authentication
    /* @Override

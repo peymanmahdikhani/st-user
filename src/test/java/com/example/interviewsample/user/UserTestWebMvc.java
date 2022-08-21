@@ -3,15 +3,17 @@ package com.example.interviewsample.user;
 import com.example.interviewsample.service.UserService;
 import com.example.interviewsample.web.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -21,6 +23,7 @@ import java.util.Optional;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 /**
@@ -29,7 +32,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Url: www.linkedin.com/in/peyman-mahdikhani
  * workspace
  */
-@WebMvcTest
+//@WebMvcTest
+@SpringBootTest
 @ActiveProfiles("test")
 public class UserTestWebMvc {
     @Autowired
@@ -73,6 +77,15 @@ public class UserTestWebMvc {
         mockMvc
                 .perform(get("/user/0").with(httpBasic("admin","pass")))
                 .andExpect(MockMvcResultMatchers.content().json(userStr));
+    }
+
+    @Test
+    public void testCustomAuthentication() throws Exception {
+        mockMvc
+                .perform(delete("/user/0")
+                        .header("Api-Key","admin")
+                        .header("Api-Secret", "pass"))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
     }
 
     @Test
