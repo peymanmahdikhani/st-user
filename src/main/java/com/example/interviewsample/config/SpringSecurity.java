@@ -54,6 +54,8 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter{
                         .antMatchers("/", "/somepath/**").permitAll()
                         //expect some url from authentication with methods
                         .antMatchers(HttpMethod.GET,"/someapi").permitAll()
+                        .antMatchers(HttpMethod.GET,"/someapi2").hasAnyRole("ADMIN")
+                        .antMatchers(HttpMethod.GET,"/someapi3").hasAnyAuthority("AUTH1")
                         //mvcMatchers
                         .mvcMatchers(HttpMethod.GET, "/apipath/{userId}").permitAll()
         );
