@@ -19,5 +19,6 @@ import java.io.Serializable;
 public class User implements Serializable {
     private Long id;
     @NotNull
+//    @NotNull(groups = BasicInfo.class)
     private String name;
 }
